@@ -27,6 +27,85 @@ PLAYERS_OUT = DATA_DIR / "players.json"
 DATA_DIR.mkdir(parents=True, exist_ok=True)
 IMAGES_DIR.mkdir(parents=True, exist_ok=True)
 
+# Hardcoded Wikipedia page titles for players whose names don't match automatically
+WIKI_TITLES = {
+    "Carlos Alcaraz":              "Carlos_Alcaraz",
+    "Ben Shelton":                 "Ben_Shelton_(tennis)",
+    "Alex De Minaur":              "Alex_de_Minaur",
+    "Taylor Fritz":                "Taylor_Fritz",
+    "Flavio Cobolli":              "Flavio_Cobolli",
+    "Alexander Bublik":            "Alexander_Bublik",
+    "Jiri Lehecka":                "Jiří_Lehečka",
+    "Casper Ruud":                 "Casper_Ruud",
+    "Karen Khachanov":             "Karen_Khachanov",
+    "Lorenzo Musetti":             "Lorenzo_Musetti",
+    "Jakub Mensik":                "Jakub_Menšík",
+    "Luciano Darderi":             "Luciano_Darderi",
+    "Learner Tien":                "Learner_Tien",
+    "Valentin Vacherot":           "Valentin_Vacherot",
+    "Rafael Jodar":                "Rafael_Jodar",
+    "Joao Fonseca":                "João_Fonseca_(tennis)",
+    "Tommy Paul":                  "Tommy_Paul_(tennis)",
+    "Cameron Norrie":              "Cameron_Norrie",
+    "Tomas Martin Etcheverry":     "Tomás_Martín_Etcheverry",
+    "Alejandro Tabilo":            "Alejandro_Tabilo",
+    "Brandon Nakashima":           "Brandon_Nakashima",
+    "Ugo Humbert":                 "Ugo_Humbert",
+    "Matteo Arnaldi":              "Matteo_Arnaldi",
+    "Ignacio Buse":                "Ignacio_Buse",
+    "Corentin Moutet":             "Corentin_Moutet",
+    "Alexander Blockx":            "Alexander_Blockx",
+    "Alex Michelsen":              "Alex_Michelsen",
+    "Mariano Navone":              "Mariano_Navone",
+    "Zizou Bergs":                 "Zizou_Bergs",
+    "Juan Manuel Cerundolo":       "Juan_Manuel_Cerundolo",
+    "Adrian Mannarino":            "Adrian_Mannarino",
+    "Matteo Berrettini":           "Matteo_Berrettini",
+    "Miomir Kecmanovic":           "Miomir_Kecmanović",
+    "Nuno Borges":                 "Nuno_Borges_(tennis)",
+    "Raphael Collignon":           "Raphaël_Collignon",
+    "Thiago Agustin Tirante":      "Thiago_Agustín_Tirante",
+    "Terence Atmane":              "Terence_Atmane",
+    "Gabriel Diallo":              "Gabriel_Diallo",
+    "Botic Van De Zandschulp":     "Botic_van_de_Zandschulp",
+    "Sebastian Baez":              "Sebastián_Báez",
+    "Camilo Ugo Carabelli":        "Camilo_Ugo_Carabelli",
+    "Martin Landaluce":            "Martín_Landaluce",
+    "Yannick Hanfmann":            "Yannick_Hanfmann",
+    "Roman Andres Burruchaga":     "Román_Andrés_Burruchaga",
+    "Vit Kopriva":                 "Vít_Kopřiva",
+    "Ethan Quinn":                 "Ethan_Quinn_(tennis)",
+    "Hamad Medjedovic":            "Hamad_Medjedovic",
+    "Aleksandar Kovacevic":        "Aleksandar_Kovačević_(tennis)",
+    "Dino Prizmic":                "Dino_Prižmić",
+    "Pablo Carreno-Busta":         "Pablo_Carreño_Busta",
+    "Adolfo Daniel Vallejo":       "Adolfo_Daniel_Vallejo",
+    "Jenson Brooksby":             "Jenson_Brooksby",
+    "Valentin Royer":              "Valentin_Royer",
+    "Marton Fucsovics":            "Márton_Fucsovics",
+    "Kamil Majchrzak":             "Kamil_Majchrzak",
+    "Jan-Lennard Struff":          "Jan-Lennard_Struff",
+    "Mattia Bellucci":             "Mattia_Bellucci",
+    "James Duckworth":             "James_Duckworth_(tennis)",
+    "Marco Trungelliti":           "Marco_Trungelliti",
+    "Arthur Cazaux":               "Arthur_Cazaux",
+    "Daniel Merida Aguilar":       "Daniel_Mérida",
+    "Jesper De Jong":              "Jesper_de_Jong_(tennis)",
+    "Daniel Altmaier":             "Daniel_Altmaier",
+    "Reilly Opelka":               "Reilly_Opelka",
+    "Emilio Nava":                 "Emilio_Nava",
+    "Marcos Giron":                "Marcos_Giron",
+    "Francisco Comesana":          "Francisco_Comesaña",
+    "Alexei Popyrin":              "Alexei_Popyrin",
+    "Adam Walton":                 "Adam_Walton_(tennis)",
+    "Quentin Halys":               "Quentin_Halys",
+    "Giovanni Mpetshi Perricard":  "Giovanni_Mpetshi_Perricard",
+    "Jaime Faria":                 "Jaime_Faria_(tennis)",
+    "Luca Van Assche":             "Luca_Van_Assche",
+    "Benjamin Bonzi":              "Benjamin_Bonzi",
+    "Aleksandar Vukic":            "Aleksandar_Vukic",
+}
+
 def get_rankings():
     r = requests.get(
         "https://tennis-api-atp-wta-itf.p.rapidapi.com/tennis/v2/atp/ranking/singles",
@@ -41,54 +120,22 @@ def get_rankings():
     return data
 
 def get_wikipedia_photo(player_name):
-    """Try multiple name formats against Wikipedia REST API."""
-    # Build a list of name variants to try
-    name_underscored = player_name.replace(" ", "_")
-    last_name = player_name.split()[-1]
-    first_last = "_".join(player_name.split()[:2]) if len(player_name.split()) > 1 else name_underscored
+    """Get photo URL from Wikipedia REST API."""
+    # Use hardcoded title if available, otherwise try name directly
+    title = WIKI_TITLES.get(player_name, player_name.replace(" ", "_"))
 
-    variants = [
-        name_underscored,
-        first_last,
-        last_name,
-    ]
-
-    for variant in variants:
-        try:
-            r = requests.get(
-                f"https://en.wikipedia.org/api/rest_v1/page/summary/{variant}",
-                headers=WIKI_HEADERS,
-                timeout=10
-            )
-            if r.status_code == 200:
-                data = r.json()
-                # Make sure it's actually a person/tennis player page
-                thumb = data.get("thumbnail", {}).get("source", "")
-                if thumb:
-                    return thumb
-        except Exception:
-            continue
-
-    # Final fallback: use search API
     try:
-        search = requests.get(
-            "https://en.wikipedia.org/w/api.php",
-            params={"action":"query","list":"search","srsearch":player_name+" tennis","srlimit":1,"format":"json"},
+        r = requests.get(
+            f"https://en.wikipedia.org/api/rest_v1/page/summary/{title}",
             headers=WIKI_HEADERS,
             timeout=10
         )
-        results = search.json().get("query", {}).get("search", [])
-        if results:
-            title = results[0]["title"].replace(" ", "_")
-            r = requests.get(
-                f"https://en.wikipedia.org/api/rest_v1/page/summary/{title}",
-                headers=WIKI_HEADERS,
-                timeout=10
-            )
-            if r.status_code == 200:
-                return r.json().get("thumbnail", {}).get("source", "")
-    except Exception:
-        pass
+        if r.status_code == 200:
+            thumb = r.json().get("thumbnail", {}).get("source", "")
+            if thumb:
+                return thumb
+    except Exception as e:
+        print(f"    ⚠ Wikipedia error: {e}")
 
     return ""
 
@@ -118,7 +165,7 @@ for i, entry in enumerate(rankings, 1):
     p    = entry["player"]
     pid  = p["id"]
     name = p["name"]
-    rank = entry.get("position", i)
+    rank = entry.get("position", 1)
 
     print(f"[{i:3}/100] #{rank} {name}")
 
@@ -132,10 +179,7 @@ for i, entry in enumerate(rankings, 1):
         photo_url = get_wikipedia_photo(name)
         if photo_url:
             has_photo = download_image(photo_url, img_path)
-            if has_photo:
-                print(f"  ✓ Downloaded")
-            else:
-                print(f"  – Download failed")
+            print(f"  {'✓ Downloaded' if has_photo else '– Download failed'}")
         else:
             print(f"  – No photo found")
 
@@ -148,7 +192,7 @@ for i, entry in enumerate(rankings, 1):
         "photo":   f"images/{pid}.jpg" if has_photo else "",
     })
 
-    time.sleep(0.3)
+    time.sleep(4)
 
 # ── Write players.json ────────────────────────────────────────────────────────
 
