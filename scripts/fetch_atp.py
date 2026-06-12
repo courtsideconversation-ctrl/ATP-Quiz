@@ -20,7 +20,7 @@ RAPIDAPI_HEADERS = {
 WIKI_HEADERS = {"User-Agent": "Mozilla/5.0 (Windows NT 10.0; Win64; x64) AppleWebKit/537.36 Chrome/120.0.0.0 Safari/537.36"}
 
 REPO_ROOT   = pathlib.Path(__file__).parent.parent
-DATA_DIR    = REPO_ROOT / "data"
+DATA_DIR    = REPO_ROOT / "game" / "data"
 IMAGES_DIR  = REPO_ROOT / "game" / "images"
 PLAYERS_OUT = DATA_DIR / "players.json"
 
