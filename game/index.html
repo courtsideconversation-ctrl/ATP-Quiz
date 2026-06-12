@@ -661,7 +661,7 @@ async function loadLeaderboard() {
       headers: { 'X-Master-Key': JSONBIN_KEY }
     });
     const data = await r.json();
-    const scores = (data.record?.scores || []).sort((a, b) => b.score - a.score).slice(0, 10);
+    const scores = (data.record?.scores || []).sort((a, b) => b.score - a.score);
     renderLeaderboard(scores, null);
   } catch (e) {
     list.innerHTML = '<div class="lb-loading">Could not load scores.</div>';
@@ -717,8 +717,7 @@ async function submitScore(name) {
     });
 
     // Show updated leaderboard with your entry highlighted
-    const top10 = trimmed.slice(0, 10);
-    renderLeaderboard(top10, name);
+    renderLeaderboard(trimmed, name);
   } catch (e) {
     console.error('Failed to save score', e);
   }
