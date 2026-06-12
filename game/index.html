@@ -744,11 +744,12 @@ function norm(s) {
 }
 
 function checkAnswer(guess) {
-  const full   = norm(current.name);
-  const parts  = full.split(' ');
-  const last   = parts[parts.length - 1];
-  const g      = norm(guess);
-  return g.length >= 2 && (g === full || g === last || full.includes(g));
+  const full  = norm(current.name);
+  const parts = full.split(' ');
+  const last  = parts[parts.length - 1];
+  const first = parts[0];
+  const g     = norm(guess);
+  return g.length >= 3 && (g === full || g === last || g === first);
 }
 
 function flashOverlay(type, text) {
