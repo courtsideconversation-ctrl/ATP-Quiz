@@ -764,7 +764,7 @@ function markCorrect() {
   if (streak > bestStreak) bestStreak = streak;
   flashOverlay('correct', '✓ ' + current.name);
   updateHUD();
-  setTimeout(nextPlayer, 900);
+  setTimeout(() => { nextPlayer(); document.getElementById('name-input').focus(); }, 900);
 }
 
 function markWrong(label = '') {
