@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Guess the Player — ATP Top 100 · CourtsideConversation</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
+<style>
+  /* ── Tokens (matches CourtsideConversation dark nav palette) ── */
+  :root {
+    --bg:         #1e1e1e;
+    --surface:    #2a2a2a;
+    --surface2:   #333333;
+    --accent:     #c8e63c;   /* yellow-green */
+    --accent-dim: #a0b82e;
+    --text:       #f0f0f0;
+    --muted:      #888;
+    --border:     #3a3a3a;
+    --correct:    #4caf6e;
+    --wrong:      #e25c5c;
+    --font-display: 'Playfair Display', Georgia, serif;
+    --font-body:    'Inter', system-ui, sans-serif;
+    --radius:     12px;
+  }
+
+  *, *::before, *::after { box-sizing: border-box; margin: 0; padding: 0; }
+
+  body {
+    background: var(--bg);
+    color: var(--text);
+    font-family: var(--font-body);
+    min-height: 100vh;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+  }
+
+  /* ── Header ── */
+  header {
+    width: 100%;
+    background: var(--surface);
+    border-bottom: 1px solid var(--border);
+    padding: 14px 24px;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+  }
+  .logo {
+    font-family: var(--font-display);
+    font-size: 18px;
+    color: var(--accent);
+    text-decoration: none;
+    letter-spacing: -0.3px;
+  }
+  .logo span { color: var(--text); }
+
+  /* ── Main layout ── */
+  main {
+    width: 100%;
+    max-width: 560px;
+    padding: 32px 16px 64px;
+    display: flex;
+    flex-direction: column;
+    gap: 20px;
+  }
+
+  /* ── Screens ── */
+  .screen { display: none; flex-direction: column; gap: 20px; }
+  .screen.active { display: flex; }
+
+  /* ── Start screen ── */
+  .game-title {
+    font-family: var(--font-display);
+    font-size: 38px;
+    line-height: 1.1;
+    font-weight: 900;
+    text-align: center;
+  }
+  .game-title em {
+    font-style: normal;
+    color: var(--accent);
+  }
+  .subtitle {
+    text-align: center;
+    color: var(--muted);
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  /* ── Mode toggle ── */
+  .mode-label {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 8px;
+    text-align: center;
+  }
+  .mode-toggle {
+    display: flex;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    padding: 4px;
+    gap: 4px;
+  }
+  .mode-btn {
+    flex: 1;
+    padding: 10px 16px;
+    border: none;
+    border-radius: 100px;
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background 0.15s, color 0.15s;
+  }
+  .mode-btn.active {
+    background: var(--accent);
+    color: #1a1a1a;
+  }
+
+  /* ── Duration picker ── */
+  .duration-row {
+    display: flex;
+    gap: 8px;
+    justify-content: center;
+  }
+  .dur-btn {
+    padding: 8px 20px;
+    border: 1px solid var(--border);
+    border-radius: 100px;
+    background: var(--surface);
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: pointer;
+    transition: all 0.15s;
+  }
+  .dur-btn.active {
+    border-color: var(--accent);
+    color: var(--accent);
+  }
+
+  /* ── Start button ── */
+  .btn-start {
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #1a1a1a;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s, transform 0.1s;
+  }
+  .btn-start:hover { background: var(--accent-dim); }
+  .btn-start:active { transform: scale(0.98); }
+  .btn-start:disabled { opacity: 0.4; cursor: not-allowed; }
+
+  /* ── HUD (timer + score) ── */
+  .hud {
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 14px 20px;
+  }
+  .hud-item { text-align: center; }
+  .hud-val {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    line-height: 1;
+  }
+  .hud-lbl {
+    font-size: 11px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.06em;
+    margin-top: 3px;
+  }
+  #timer-val { color: var(--accent); }
+  #timer-val.danger { color: var(--wrong); }
+  .progress-bar {
+    height: 3px;
+    background: var(--border);
+    border-radius: 2px;
+    overflow: hidden;
+    margin-top: -8px;
+  }
+  .progress-fill {
+    height: 100%;
+    background: var(--accent);
+    transition: width 1s linear, background 0.5s;
+  }
+
+  /* ── Player card ── */
+  .player-card {
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    overflow: hidden;
+    position: relative;
+  }
+  .player-photo-wrap {
+    width: 100%;
+    aspect-ratio: 3/4;
+    max-height: 340px;
+    background: var(--surface2);
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    overflow: hidden;
+    position: relative;
+  }
+  .player-photo-wrap img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    object-position: top center;
+  }
+  .photo-fallback {
+    font-size: 72px;
+    color: var(--border);
+  }
+  .rank-badge {
+    position: absolute;
+    top: 12px;
+    left: 12px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 4px 10px;
+    font-size: 13px;
+    color: var(--muted);
+    backdrop-filter: blur(4px);
+  }
+  .rank-badge strong { color: var(--accent); }
+  .country-badge {
+    position: absolute;
+    top: 12px;
+    right: 12px;
+    background: rgba(0,0,0,0.7);
+    border: 1px solid var(--border);
+    border-radius: 6px;
+    padding: 5px 10px;
+    font-size: 13px;
+    font-weight: 600;
+    backdrop-filter: blur(4px);
+  }
+
+  /* ── Answer feedback overlay ── */
+  .answer-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    padding: 14px 18px;
+    font-family: var(--font-display);
+    font-size: 22px;
+    font-weight: 700;
+    text-align: center;
+    opacity: 0;
+    transform: translateY(6px);
+    transition: opacity 0.2s, transform 0.2s;
+  }
+  .answer-overlay.show {
+    opacity: 1;
+    transform: translateY(0);
+  }
+  .answer-overlay.correct {
+    background: rgba(76,175,110,0.92);
+    color: #fff;
+  }
+  .answer-overlay.wrong {
+    background: rgba(226,92,92,0.92);
+    color: #fff;
+  }
+  .answer-overlay.skip {
+    background: rgba(50,50,50,0.92);
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 15px;
+    font-weight: 400;
+  }
+
+  /* ── Type mode input ── */
+  .type-area {
+    display: flex;
+    gap: 8px;
+  }
+  #name-input {
+    flex: 1;
+    padding: 14px 16px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 16px;
+    outline: none;
+    transition: border-color 0.15s;
+  }
+  #name-input:focus { border-color: var(--accent); }
+  #name-input.correct { border-color: var(--correct); }
+  #name-input.wrong   { border-color: var(--wrong); }
+
+  .btn-skip {
+    padding: 14px 18px;
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    background: transparent;
+    color: var(--muted);
+    font-family: var(--font-body);
+    font-size: 14px;
+    cursor: pointer;
+    white-space: nowrap;
+    transition: border-color 0.15s, color 0.15s;
+  }
+  .btn-skip:hover { border-color: var(--text); color: var(--text); }
+
+  /* ── Multiple choice mode ── */
+  .choices {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 10px;
+  }
+  .choice-btn {
+    padding: 14px 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    color: var(--text);
+    font-family: var(--font-body);
+    font-size: 14px;
+    font-weight: 500;
+    cursor: pointer;
+    text-align: left;
+    transition: border-color 0.12s, background 0.12s;
+    line-height: 1.4;
+  }
+  .choice-btn:hover:not(:disabled) { border-color: var(--accent); }
+  .choice-btn.correct { background: rgba(76,175,110,0.2); border-color: var(--correct); color: var(--correct); }
+  .choice-btn.wrong   { background: rgba(226,92,92,0.15);  border-color: var(--wrong);  color: var(--wrong); }
+  .choice-btn:disabled { cursor: default; }
+
+  /* ── Results screen ── */
+  .results-header {
+    text-align: center;
+  }
+  .results-score {
+    font-family: var(--font-display);
+    font-size: 64px;
+    font-weight: 900;
+    color: var(--accent);
+    line-height: 1;
+  }
+  .results-label {
+    font-size: 15px;
+    color: var(--muted);
+    margin-top: 6px;
+  }
+  .stat-row {
+    display: flex;
+    gap: 10px;
+  }
+  .stat-box {
+    flex: 1;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: var(--radius);
+    padding: 16px;
+    text-align: center;
+  }
+  .stat-val {
+    font-family: var(--font-display);
+    font-size: 28px;
+    font-weight: 700;
+    color: var(--text);
+  }
+  .stat-lbl {
+    font-size: 12px;
+    color: var(--muted);
+    margin-top: 4px;
+  }
+
+  /* ── Missed players list ── */
+  .missed-section h3 {
+    font-size: 13px;
+    color: var(--muted);
+    text-transform: uppercase;
+    letter-spacing: 0.07em;
+    margin-bottom: 12px;
+  }
+  .missed-list {
+    display: flex;
+    flex-direction: column;
+    gap: 8px;
+    max-height: 260px;
+    overflow-y: auto;
+  }
+  .missed-item {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    background: var(--surface);
+    border: 1px solid var(--border);
+    border-radius: 8px;
+    padding: 10px 14px;
+  }
+  .missed-rank {
+    font-size: 12px;
+    color: var(--muted);
+    min-width: 32px;
+  }
+  .missed-thumb {
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    background: var(--surface2);
+    object-fit: cover;
+    object-position: top;
+    flex-shrink: 0;
+  }
+  .missed-name {
+    font-size: 14px;
+    font-weight: 500;
+  }
+  .missed-country {
+    font-size: 12px;
+    color: var(--muted);
+    margin-left: auto;
+  }
+
+  .btn-play-again {
+    padding: 16px;
+    border: none;
+    border-radius: var(--radius);
+    background: var(--accent);
+    color: #1a1a1a;
+    font-family: var(--font-body);
+    font-size: 16px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: background 0.15s;
+  }
+  .btn-play-again:hover { background: var(--accent-dim); }
+
+  /* ── Loading / error state ── */
+  .loading-msg {
+    text-align: center;
+    color: var(--muted);
+    padding: 40px 0;
+    font-size: 15px;
+  }
+  .error-msg {
+    text-align: center;
+    color: var(--wrong);
+    padding: 40px 0;
+    font-size: 15px;
+    line-height: 1.6;
+  }
+
+  @media (max-width: 480px) {
+    .game-title { font-size: 30px; }
+    .choices { grid-template-columns: 1fr; }
+    .player-photo-wrap { max-height: 260px; }
+  }
+</style>
+</head>
+<body>
+
+<header>
+  <a class="logo" href="https://courtsideconversation.com">Courtside<span>Conversation</span></a>
+  <span style="font-size:13px;color:var(--muted)">ATP Top 100 Quiz</span>
+</header>
+
+<main>
+
+  <!-- ── Start screen ───────────────────────────────────────────── -->
+  <div class="screen active" id="screen-start">
+    <div>
+      <h1 class="game-title">Guess the<br><em>ATP Player</em></h1>
+      <p class="subtitle" style="margin-top:10px">
+        A photo. A clock. How many ATP Top 100 players can you name?
+      </p>
+    </div>
+
+    <div>
+      <p class="mode-label">Answer mode</p>
+      <div class="mode-toggle">
+        <button class="mode-btn active" data-mode="type">Type the name</button>
+        <button class="mode-btn" data-mode="mc">Multiple choice</button>
+      </div>
+    </div>
+
+    <div>
+      <p class="mode-label">Time limit</p>
+      <div class="duration-row">
+        <button class="dur-btn" data-secs="60">1 min</button>
+        <button class="dur-btn active" data-secs="120">2 min</button>
+        <button class="dur-btn" data-secs="180">3 min</button>
+      </div>
+    </div>
+
+    <button class="btn-start" id="btn-start" disabled>Loading players…</button>
+    <p id="load-status" class="loading-msg">Fetching ATP top 100…</p>
+  </div>
+
+  <!-- ── Game screen ────────────────────────────────────────────── -->
+  <div class="screen" id="screen-game">
+    <div class="hud">
+      <div class="hud-item">
+        <div class="hud-val" id="timer-val">60</div>
+        <div class="hud-lbl">Seconds</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-val" id="score-val">0</div>
+        <div class="hud-lbl">Correct</div>
+      </div>
+      <div class="hud-item">
+        <div class="hud-val" id="asked-val">0</div>
+        <div class="hud-lbl">Asked</div>
+      </div>
+    </div>
+    <div class="progress-bar">
+      <div class="progress-fill" id="progress-fill"></div>
+    </div>
+
+    <div class="player-card" id="player-card">
+      <div class="player-photo-wrap">
+        <img id="player-photo" src="" alt="Player photo" onerror="this.style.display='none';document.getElementById('photo-fb').style.display='flex'">
+        <div id="photo-fb" style="display:none;position:absolute;inset:0;align-items:center;justify-content:center;font-size:72px;color:#3a3a3a">🎾</div>
+        <div class="rank-badge">Rank <strong id="player-rank">#1</strong></div>
+        <div class="country-badge" id="player-country">ESP</div>
+      </div>
+      <div class="answer-overlay" id="answer-overlay"></div>
+    </div>
+
+    <!-- Type mode -->
+    <div id="type-area" class="type-area">
+      <input type="text" id="name-input" placeholder="Type last name or full name…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <button class="btn-skip" id="btn-skip">Skip</button>
+    </div>
+
+    <!-- Multiple choice mode -->
+    <div id="mc-area" class="choices" style="display:none"></div>
+  </div>
+
+  <!-- ── Results screen ─────────────────────────────────────────── -->
+  <div class="screen" id="screen-results">
+    <div class="results-header">
+      <div class="results-score" id="final-score">0</div>
+      <div class="results-label">players identified</div>
+    </div>
+
+    <div class="stat-row">
+      <div class="stat-box">
+        <div class="stat-val" id="stat-asked">0</div>
+        <div class="stat-lbl">Shown</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="stat-acc">—</div>
+        <div class="stat-lbl">Accuracy</div>
+      </div>
+      <div class="stat-box">
+        <div class="stat-val" id="stat-streak">0</div>
+        <div class="stat-lbl">Best streak</div>
+      </div>
+    </div>
+
+    <div class="missed-section" id="missed-section" style="display:none">
+      <h3>Missed players</h3>
+      <div class="missed-list" id="missed-list"></div>
+    </div>
+
+    <button class="btn-play-again" id="btn-play-again">Play again</button>
+  </div>
+
+</main>
+
+<script>
+// ─── State ─────────────────────────────────────────────────────────────────
+
+let players   = [];          // full loaded list
+let queue     = [];          // shuffled copy for this game
+let current   = null;        // current player object
+let mode      = 'type';      // 'type' | 'mc'
+let totalSecs = 120;
+let timer     = null;
+let secsLeft  = 0;
+
+let score    = 0;
+let asked    = 0;
+let streak   = 0;
+let bestStreak = 0;
+let missed   = [];           // players the user got wrong or skipped
+
+// ─── Load players.json ──────────────────────────────────────────────────────
+
+async function loadPlayers() {
+  try {
+    const r = await fetch('data/players.json');
+    if (!r.ok) throw new Error(`HTTP ${r.status}`);
+    players = await r.json();
+    document.getElementById('load-status').style.display = 'none';
+    document.getElementById('btn-start').disabled = false;
+    document.getElementById('btn-start').textContent = 'Start game';
+  } catch (e) {
+    document.getElementById('load-status').className = 'error-msg';
+    document.getElementById('load-status').innerHTML =
+      `Could not load player data.<br>Make sure you've run <code>fetch_atp.py</code> first.`;
+  }
+}
+
+loadPlayers();
+
+// ─── UI helpers ─────────────────────────────────────────────────────────────
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
+  document.getElementById(id).classList.add('active');
+}
+
+function shuffle(arr) {
+  const a = [...arr];
+  for (let i = a.length - 1; i > 0; i--) {
+    const j = Math.floor(Math.random() * (i + 1));
+    [a[i], a[j]] = [a[j], a[i]];
+  }
+  return a;
+}
+
+// ─── Mode / duration toggles ─────────────────────────────────────────────────
+
+document.querySelectorAll('.mode-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.mode-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    mode = btn.dataset.mode;
+  });
+});
+
+document.querySelectorAll('.dur-btn').forEach(btn => {
+  btn.addEventListener('click', () => {
+    document.querySelectorAll('.dur-btn').forEach(b => b.classList.remove('active'));
+    btn.classList.add('active');
+    totalSecs = parseInt(btn.dataset.secs);
+  });
+});
+
+// ─── Start game ─────────────────────────────────────────────────────────────
+
+document.getElementById('btn-start').addEventListener('click', startGame);
+document.getElementById('btn-play-again').addEventListener('click', () => showScreen('screen-start'));
+
+function startGame() {
+  score = 0; asked = 0; streak = 0; bestStreak = 0; missed = [];
+  queue = shuffle(players.filter(p => p.photo || p.photoUrl)); // only players with photos
+  secsLeft = totalSecs;
+
+  document.getElementById('type-area').style.display = mode === 'type' ? 'flex' : 'none';
+  document.getElementById('mc-area').style.display   = mode === 'mc'   ? 'grid' : 'none';
+
+  updateHUD();
+  showScreen('screen-game');
+  nextPlayer();
+  startTimer();
+  if (mode === 'type') document.getElementById('name-input').focus();
+}
+
+// ─── Timer ───────────────────────────────────────────────────────────────────
+
+function startTimer() {
+  clearInterval(timer);
+  const fill = document.getElementById('progress-fill');
+  fill.style.width = '100%';
+  fill.style.background = 'var(--accent)';
+
+  timer = setInterval(() => {
+    secsLeft--;
+    const pct = (secsLeft / totalSecs) * 100;
+    document.getElementById('timer-val').textContent = secsLeft;
+    document.getElementById('timer-val').className = secsLeft <= 10 ? 'hud-val danger' : 'hud-val';
+    fill.style.width = pct + '%';
+    if (secsLeft <= 10) fill.style.background = 'var(--wrong)';
+    if (secsLeft <= 0) endGame();
+  }, 1000);
+}
+
+// ─── Show next player ────────────────────────────────────────────────────────
+
+function nextPlayer() {
+  if (queue.length === 0) { endGame(); return; }
+  current = queue.pop();
+  asked++;
+
+  // Photo
+  const img = document.getElementById('player-photo');
+  const fb  = document.getElementById('photo-fb');
+  img.style.display = 'block';
+  fb.style.display  = 'none';
+  img.src = current.photo || current.photoUrl || '';
+
+  document.getElementById('player-rank').textContent    = '#' + current.rank;
+  document.getElementById('player-country').textContent = current.country || '';
+
+  // Clear overlay
+  const ov = document.getElementById('answer-overlay');
+  ov.className = 'answer-overlay';
+  ov.textContent = '';
+
+  // Clear input
+  const inp = document.getElementById('name-input');
+  inp.value = '';
+  inp.className = '';
+
+  updateHUD();
+
+  if (mode === 'mc') buildChoices();
+}
+
+// ─── HUD update ──────────────────────────────────────────────────────────────
+
+function updateHUD() {
+  document.getElementById('score-val').textContent = score;
+  document.getElementById('asked-val').textContent = asked;
+  document.getElementById('timer-val').textContent = secsLeft;
+}
+
+// ─── Answer checking ─────────────────────────────────────────────────────────
+
+// Normalize: lowercase, remove accents, trim
+function norm(s) {
+  return s.toLowerCase()
+    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
+    .replace(/[^a-z\s]/g, '')
+    .trim();
+}
+
+function checkAnswer(guess) {
+  const full   = norm(current.name);
+  const parts  = full.split(' ');
+  const last   = parts[parts.length - 1];
+  const g      = norm(guess);
+  return g.length >= 2 && (g === full || g === last || full.includes(g));
+}
+
+function flashOverlay(type, text) {
+  const ov = document.getElementById('answer-overlay');
+  ov.textContent = text;
+  ov.className   = `answer-overlay ${type} show`;
+}
+
+function markCorrect() {
+  score++;
+  streak++;
+  if (streak > bestStreak) bestStreak = streak;
+  flashOverlay('correct', '✓ ' + current.name);
+  updateHUD();
+  setTimeout(nextPlayer, 900);
+}
+
+function markWrong(label = '') {
+  streak = 0;
+  missed.push(current);
+  flashOverlay('wrong', '✗ ' + current.name);
+  updateHUD();
+  setTimeout(nextPlayer, 1100);
+}
+
+function markSkip() {
+  streak = 0;
+  missed.push(current);
+  flashOverlay('skip', current.name);
+  setTimeout(nextPlayer, 1000);
+}
+
+// ─── Type mode ───────────────────────────────────────────────────────────────
+
+const inp = document.getElementById('name-input');
+
+inp.addEventListener('input', () => {
+  if (checkAnswer(inp.value)) {
+    inp.className = 'correct';
+    inp.blur();
+    markCorrect();
+  }
+});
+
+inp.addEventListener('keydown', e => {
+  if (e.key === 'Enter' && inp.value.trim()) {
+    if (!checkAnswer(inp.value)) {
+      inp.className = 'wrong';
+      markWrong();
+    }
+  }
+  if (e.key === 'Escape') markSkip();
+});
+
+document.getElementById('btn-skip').addEventListener('click', markSkip);
+
+// ─── Multiple choice mode ────────────────────────────────────────────────────
+
+function buildChoices() {
+  const container = document.getElementById('mc-area');
+  container.innerHTML = '';
+
+  // Pick 3 wrong answers from the pool (not current)
+  const others = shuffle(players.filter(p => p.id !== current.id)).slice(0, 3);
+  const options = shuffle([current, ...others]);
+
+  options.forEach(player => {
+    const btn = document.createElement('button');
+    btn.className = 'choice-btn';
+    btn.innerHTML = `<span style="font-size:12px;color:var(--muted)">Rank #${player.rank}</span><br>${player.name}`;
+    btn.addEventListener('click', () => {
+      // Disable all
+      container.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
+      if (player.id === current.id) {
+        btn.classList.add('correct');
+        markCorrect();
+      } else {
+        btn.classList.add('wrong');
+        // Highlight correct
+        container.querySelectorAll('.choice-btn').forEach(b => {
+          if (b.textContent.includes(current.name.split(' ').pop())) b.classList.add('correct');
+        });
+        markWrong();
+      }
+    });
+    container.appendChild(btn);
+  });
+}
+
+// ─── End game ────────────────────────────────────────────────────────────────
+
+function endGame() {
+  clearInterval(timer);
+
+  document.getElementById('final-score').textContent = score;
+  document.getElementById('stat-asked').textContent  = asked;
+  document.getElementById('stat-acc').textContent    = asked > 0
+    ? Math.round((score / asked) * 100) + '%' : '—';
+  document.getElementById('stat-streak').textContent = bestStreak;
+
+  const ms = document.getElementById('missed-section');
+  const ml = document.getElementById('missed-list');
+  ml.innerHTML = '';
+
+  if (missed.length > 0) {
+    ms.style.display = 'block';
+    missed.forEach(p => {
+      const el = document.createElement('div');
+      el.className = 'missed-item';
+      el.innerHTML = `
+        <span class="missed-rank">#${p.rank}</span>
+        <img class="missed-thumb" src="${p.photo || p.photoUrl || ''}" alt="" onerror="this.style.display='none'">
+        <span class="missed-name">${p.name}</span>
+        <span class="missed-country">${p.country || ''}</span>
+      `;
+      ml.appendChild(el);
+    });
+  } else {
+    ms.style.display = 'none';
+  }
+
+  showScreen('screen-results');
+}
+</script>
+</body>
+</html>
