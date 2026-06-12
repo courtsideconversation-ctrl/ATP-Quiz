@@ -7,7 +7,6 @@
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=Inter:wght@400;500;600&display=swap" rel="stylesheet">
 <style>
-  /* ── Tokens (matches CourtsideConversation dark nav palette) ── */
   :root {
     --bg:         #1e1e1e;
     --surface:    #2a2a2a;
@@ -36,7 +35,6 @@
     align-items: center;
   }
 
-  /* ── Header ── */
   header {
     width: 100%;
     background: var(--surface);
@@ -46,16 +44,7 @@
     align-items: center;
     justify-content: space-between;
   }
-  .logo {
-    font-family: var(--font-display);
-    font-size: 18px;
-    color: var(--accent);
-    text-decoration: none;
-    letter-spacing: -0.3px;
-  }
-  .logo span { color: var(--text); }
 
-  /* ── Main layout ── */
   main {
     width: 100%;
     max-width: 560px;
@@ -65,11 +54,9 @@
     gap: 20px;
   }
 
-  /* ── Screens ── */
   .screen { display: none; flex-direction: column; gap: 20px; }
   .screen.active { display: flex; }
 
-  /* ── Start screen ── */
   .game-title {
     font-family: var(--font-display);
     font-size: 38px;
@@ -77,10 +64,8 @@
     font-weight: 900;
     text-align: center;
   }
-  .game-title em {
-    font-style: normal;
-    color: var(--accent);
-  }
+  .game-title em { font-style: normal; color: var(--accent); }
+
   .subtitle {
     text-align: center;
     color: var(--muted);
@@ -88,7 +73,6 @@
     line-height: 1.6;
   }
 
-  /* ── Mode toggle ── */
   .mode-label {
     font-size: 13px;
     color: var(--muted);
@@ -118,17 +102,9 @@
     cursor: pointer;
     transition: background 0.15s, color 0.15s;
   }
-  .mode-btn.active {
-    background: var(--accent);
-    color: #1a1a1a;
-  }
+  .mode-btn.active { background: var(--accent); color: #1a1a1a; }
 
-  /* ── Duration picker ── */
-  .duration-row {
-    display: flex;
-    gap: 8px;
-    justify-content: center;
-  }
+  .duration-row { display: flex; gap: 8px; justify-content: center; }
   .dur-btn {
     padding: 8px 20px;
     border: 1px solid var(--border);
@@ -140,12 +116,8 @@
     cursor: pointer;
     transition: all 0.15s;
   }
-  .dur-btn.active {
-    border-color: var(--accent);
-    color: var(--accent);
-  }
+  .dur-btn.active { border-color: var(--accent); color: var(--accent); }
 
-  /* ── Start button ── */
   .btn-start {
     padding: 16px;
     border: none;
@@ -162,7 +134,6 @@
   .btn-start:active { transform: scale(0.98); }
   .btn-start:disabled { opacity: 0.4; cursor: not-allowed; }
 
-  /* ── HUD (timer + score) ── */
   .hud {
     display: flex;
     align-items: center;
@@ -173,35 +144,14 @@
     padding: 14px 20px;
   }
   .hud-item { text-align: center; }
-  .hud-val {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 700;
-    line-height: 1;
-  }
-  .hud-lbl {
-    font-size: 11px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.06em;
-    margin-top: 3px;
-  }
+  .hud-val { font-family: var(--font-display); font-size: 28px; font-weight: 700; line-height: 1; }
+  .hud-lbl { font-size: 11px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.06em; margin-top: 3px; }
   #timer-val { color: var(--accent); }
   #timer-val.danger { color: var(--wrong); }
-  .progress-bar {
-    height: 3px;
-    background: var(--border);
-    border-radius: 2px;
-    overflow: hidden;
-    margin-top: -8px;
-  }
-  .progress-fill {
-    height: 100%;
-    background: var(--accent);
-    transition: width 1s linear, background 0.5s;
-  }
 
-  /* ── Player card ── */
+  .progress-bar { height: 3px; background: var(--border); border-radius: 2px; overflow: hidden; margin-top: -8px; }
+  .progress-fill { height: 100%; background: var(--accent); transition: width 1s linear, background 0.5s; }
+
   .player-card {
     background: var(--surface);
     border: 1px solid var(--border);
@@ -220,251 +170,145 @@
     overflow: hidden;
     position: relative;
   }
-  .player-photo-wrap img {
-    width: 100%;
-    height: 100%;
-    object-fit: contain;
-    background: var(--surface2);
-  }
-  .photo-fallback {
-    font-size: 72px;
-    color: var(--border);
-  }
+  .player-photo-wrap img { width: 100%; height: 100%; object-fit: contain; background: var(--surface2); }
   .rank-badge {
-    position: absolute;
-    top: 12px;
-    left: 12px;
-    background: rgba(0,0,0,0.7);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 4px 10px;
-    font-size: 13px;
-    color: var(--muted);
+    position: absolute; top: 12px; left: 12px;
+    background: rgba(0,0,0,0.7); border: 1px solid var(--border);
+    border-radius: 6px; padding: 4px 10px; font-size: 13px; color: var(--muted);
     backdrop-filter: blur(4px);
   }
   .rank-badge strong { color: var(--accent); }
   .country-badge {
-    position: absolute;
-    top: 12px;
-    right: 12px;
-    background: rgba(0,0,0,0.7);
-    border: 1px solid var(--border);
-    border-radius: 6px;
-    padding: 5px 10px;
-    font-size: 13px;
-    font-weight: 600;
+    position: absolute; top: 12px; right: 12px;
+    background: rgba(0,0,0,0.7); border: 1px solid var(--border);
+    border-radius: 6px; padding: 5px 10px; font-size: 13px; font-weight: 600;
     backdrop-filter: blur(4px);
   }
-
-  /* ── Answer feedback overlay ── */
   .answer-overlay {
-    position: absolute;
-    bottom: 0; left: 0; right: 0;
-    padding: 14px 18px;
-    font-family: var(--font-display);
-    font-size: 22px;
-    font-weight: 700;
-    text-align: center;
-    opacity: 0;
-    transform: translateY(6px);
+    position: absolute; bottom: 0; left: 0; right: 0;
+    padding: 14px 18px; font-family: var(--font-display); font-size: 22px;
+    font-weight: 700; text-align: center; opacity: 0; transform: translateY(6px);
     transition: opacity 0.2s, transform 0.2s;
   }
-  .answer-overlay.show {
-    opacity: 1;
-    transform: translateY(0);
-  }
-  .answer-overlay.correct {
-    background: rgba(76,175,110,0.92);
-    color: #fff;
-  }
-  .answer-overlay.wrong {
-    background: rgba(226,92,92,0.92);
-    color: #fff;
-  }
-  .answer-overlay.skip {
-    background: rgba(50,50,50,0.92);
-    color: var(--muted);
-    font-family: var(--font-body);
-    font-size: 15px;
-    font-weight: 400;
-  }
+  .answer-overlay.show { opacity: 1; transform: translateY(0); }
+  .answer-overlay.correct { background: rgba(76,175,110,0.92); color: #fff; }
+  .answer-overlay.wrong   { background: rgba(226,92,92,0.92); color: #fff; }
+  .answer-overlay.skip    { background: rgba(50,50,50,0.92); color: var(--muted); font-family: var(--font-body); font-size: 15px; font-weight: 400; }
 
-  /* ── Type mode input ── */
-  .type-area {
-    display: flex;
-    gap: 8px;
-  }
+  .type-area { display: flex; gap: 8px; }
   #name-input {
-    flex: 1;
-    padding: 14px 16px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 16px;
-    outline: none;
+    flex: 1; padding: 14px 16px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text);
+    font-family: var(--font-body); font-size: 16px; outline: none;
     transition: border-color 0.15s;
   }
-  #name-input:focus { border-color: var(--accent); }
+  #name-input:focus  { border-color: var(--accent); }
   #name-input.correct { border-color: var(--correct); }
   #name-input.wrong   { border-color: var(--wrong); }
 
   .btn-skip {
-    padding: 14px 18px;
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    background: transparent;
-    color: var(--muted);
-    font-family: var(--font-body);
-    font-size: 14px;
-    cursor: pointer;
-    white-space: nowrap;
-    transition: border-color 0.15s, color 0.15s;
+    padding: 14px 18px; border: 1px solid var(--border); border-radius: var(--radius);
+    background: transparent; color: var(--muted); font-family: var(--font-body);
+    font-size: 14px; cursor: pointer; white-space: nowrap; transition: border-color 0.15s, color 0.15s;
   }
   .btn-skip:hover { border-color: var(--text); color: var(--text); }
 
-  /* ── Multiple choice mode ── */
-  .choices {
-    display: grid;
-    grid-template-columns: 1fr 1fr;
-    gap: 10px;
-  }
+  .choices { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; }
   .choice-btn {
-    padding: 14px 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: var(--radius);
-    color: var(--text);
-    font-family: var(--font-body);
-    font-size: 14px;
-    font-weight: 500;
-    cursor: pointer;
-    text-align: left;
-    transition: border-color 0.12s, background 0.12s;
-    line-height: 1.4;
+    padding: 14px 12px; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text); font-family: var(--font-body);
+    font-size: 14px; font-weight: 500; cursor: pointer; text-align: left;
+    transition: border-color 0.12s, background 0.12s; line-height: 1.4;
   }
   .choice-btn:hover:not(:disabled) { border-color: var(--accent); }
   .choice-btn.correct { background: rgba(76,175,110,0.2); border-color: var(--correct); color: var(--correct); }
-  .choice-btn.wrong   { background: rgba(226,92,92,0.15);  border-color: var(--wrong);  color: var(--wrong); }
+  .choice-btn.wrong   { background: rgba(226,92,92,0.15); border-color: var(--wrong); color: var(--wrong); }
   .choice-btn:disabled { cursor: default; }
 
-  /* ── Results screen ── */
-  .results-header {
-    text-align: center;
-  }
-  .results-score {
-    font-family: var(--font-display);
-    font-size: 64px;
-    font-weight: 900;
-    color: var(--accent);
-    line-height: 1;
-  }
-  .results-label {
-    font-size: 15px;
-    color: var(--muted);
-    margin-top: 6px;
-  }
-  .stat-row {
-    display: flex;
-    gap: 10px;
-  }
+  .results-header { text-align: center; }
+  .results-score { font-family: var(--font-display); font-size: 64px; font-weight: 900; color: var(--accent); line-height: 1; }
+  .results-label { font-size: 15px; color: var(--muted); margin-top: 6px; }
+
+  .stat-row { display: flex; gap: 10px; }
   .stat-box {
-    flex: 1;
+    flex: 1; background: var(--surface); border: 1px solid var(--border);
+    border-radius: var(--radius); padding: 16px; text-align: center;
+  }
+  .stat-val { font-family: var(--font-display); font-size: 28px; font-weight: 700; color: var(--text); }
+  .stat-lbl { font-size: 12px; color: var(--muted); margin-top: 4px; }
+
+  .missed-section h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+  .missed-list { display: flex; flex-direction: column; gap: 8px; max-height: 260px; overflow-y: auto; }
+  .missed-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .missed-rank { font-size: 12px; color: var(--muted); min-width: 32px; }
+  .missed-thumb { width: 36px; height: 36px; border-radius: 50%; background: var(--surface2); object-fit: cover; object-position: top; flex-shrink: 0; }
+  .missed-name { font-size: 14px; font-weight: 500; }
+  .missed-country { font-size: 12px; color: var(--muted); margin-left: auto; }
+
+  /* ── Name entry for leaderboard ── */
+  .name-entry {
     background: var(--surface);
     border: 1px solid var(--border);
     border-radius: var(--radius);
-    padding: 16px;
-    text-align: center;
-  }
-  .stat-val {
-    font-family: var(--font-display);
-    font-size: 28px;
-    font-weight: 700;
-    color: var(--text);
-  }
-  .stat-lbl {
-    font-size: 12px;
-    color: var(--muted);
-    margin-top: 4px;
-  }
-
-  /* ── Missed players list ── */
-  .missed-section h3 {
-    font-size: 13px;
-    color: var(--muted);
-    text-transform: uppercase;
-    letter-spacing: 0.07em;
-    margin-bottom: 12px;
-  }
-  .missed-list {
+    padding: 20px;
     display: flex;
     flex-direction: column;
-    gap: 8px;
-    max-height: 260px;
-    overflow-y: auto;
-  }
-  .missed-item {
-    display: flex;
-    align-items: center;
     gap: 12px;
-    background: var(--surface);
-    border: 1px solid var(--border);
-    border-radius: 8px;
-    padding: 10px 14px;
   }
-  .missed-rank {
-    font-size: 12px;
-    color: var(--muted);
-    min-width: 32px;
+  .name-entry p { font-size: 14px; color: var(--muted); text-align: center; }
+  .name-entry-row { display: flex; gap: 8px; }
+  #player-name-input {
+    flex: 1; padding: 12px 14px;
+    background: var(--bg); border: 1px solid var(--border);
+    border-radius: var(--radius); color: var(--text);
+    font-family: var(--font-body); font-size: 15px; outline: none;
+    transition: border-color 0.15s;
   }
-  .missed-thumb {
-    width: 36px;
-    height: 36px;
-    border-radius: 50%;
-    background: var(--surface2);
-    object-fit: cover;
-    object-position: top;
-    flex-shrink: 0;
+  #player-name-input:focus { border-color: var(--accent); }
+  .btn-submit-score {
+    padding: 12px 18px; border: none; border-radius: var(--radius);
+    background: var(--accent); color: #1a1a1a;
+    font-family: var(--font-body); font-size: 14px; font-weight: 600;
+    cursor: pointer; white-space: nowrap;
   }
-  .missed-name {
-    font-size: 14px;
-    font-weight: 500;
-  }
-  .missed-country {
-    font-size: 12px;
-    color: var(--muted);
-    margin-left: auto;
+  .btn-skip-leaderboard {
+    background: transparent; border: none; color: var(--muted);
+    font-family: var(--font-body); font-size: 13px; cursor: pointer;
+    text-align: center; text-decoration: underline;
   }
 
+  /* ── Leaderboard ── */
+  .leaderboard-section h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+  .leaderboard-list { display: flex; flex-direction: column; gap: 6px; }
+  .lb-item {
+    display: flex; align-items: center; gap: 12px;
+    background: var(--surface); border: 1px solid var(--border);
+    border-radius: 8px; padding: 10px 14px;
+  }
+  .lb-item.lb-you { border-color: var(--accent); }
+  .lb-rank { font-size: 13px; color: var(--muted); min-width: 24px; font-weight: 600; }
+  .lb-rank.gold   { color: #ffd700; }
+  .lb-rank.silver { color: #c0c0c0; }
+  .lb-rank.bronze { color: #cd7f32; }
+  .lb-name { font-size: 14px; font-weight: 500; flex: 1; }
+  .lb-score { font-family: var(--font-display); font-size: 20px; font-weight: 700; color: var(--accent); }
+  .lb-meta { font-size: 11px; color: var(--muted); }
+  .lb-loading { text-align: center; color: var(--muted); font-size: 14px; padding: 16px 0; }
+
   .btn-play-again {
-    padding: 16px;
-    border: none;
-    border-radius: var(--radius);
-    background: var(--accent);
-    color: #1a1a1a;
-    font-family: var(--font-body);
-    font-size: 16px;
-    font-weight: 600;
-    cursor: pointer;
-    transition: background 0.15s;
+    padding: 16px; border: none; border-radius: var(--radius);
+    background: var(--accent); color: #1a1a1a; font-family: var(--font-body);
+    font-size: 16px; font-weight: 600; cursor: pointer; transition: background 0.15s;
   }
   .btn-play-again:hover { background: var(--accent-dim); }
 
-  /* ── Loading / error state ── */
-  .loading-msg {
-    text-align: center;
-    color: var(--muted);
-    padding: 40px 0;
-    font-size: 15px;
-  }
-  .error-msg {
-    text-align: center;
-    color: var(--wrong);
-    padding: 40px 0;
-    font-size: 15px;
-    line-height: 1.6;
-  }
+  .loading-msg { text-align: center; color: var(--muted); padding: 40px 0; font-size: 15px; }
+  .error-msg { text-align: center; color: var(--wrong); padding: 40px 0; font-size: 15px; line-height: 1.6; }
 
   @media (max-width: 480px) {
     .game-title { font-size: 30px; }
@@ -484,15 +328,12 @@
 
 <main>
 
-  <!-- ── Start screen ───────────────────────────────────────────── -->
+  <!-- ── Start screen ── -->
   <div class="screen active" id="screen-start">
     <div>
       <h1 class="game-title">Guess the<br><em>ATP Player</em></h1>
-      <p class="subtitle" style="margin-top:10px">
-        Name as many ATP Top 100 players as you can.
-      </p>
+      <p class="subtitle" style="margin-top:10px">Name as many ATP Top 100 players as you can.</p>
     </div>
-
     <div>
       <p class="mode-label">Answer mode</p>
       <div class="mode-toggle">
@@ -500,7 +341,6 @@
         <button class="mode-btn" data-mode="mc">Multiple choice</button>
       </div>
     </div>
-
     <div>
       <p class="mode-label">Time limit</p>
       <div class="duration-row">
@@ -509,30 +349,18 @@
         <button class="dur-btn" data-secs="180">3 min</button>
       </div>
     </div>
-
     <button class="btn-start" id="btn-start" disabled>Loading players…</button>
     <p id="load-status" class="loading-msg">Fetching ATP top 100…</p>
   </div>
 
-  <!-- ── Game screen ────────────────────────────────────────────── -->
+  <!-- ── Game screen ── -->
   <div class="screen" id="screen-game">
     <div class="hud">
-      <div class="hud-item">
-        <div class="hud-val" id="timer-val">60</div>
-        <div class="hud-lbl">Seconds</div>
-      </div>
-      <div class="hud-item">
-        <div class="hud-val" id="score-val">0</div>
-        <div class="hud-lbl">Correct</div>
-      </div>
-      <div class="hud-item">
-        <div class="hud-val" id="asked-val">0</div>
-        <div class="hud-lbl">Asked</div>
-      </div>
+      <div class="hud-item"><div class="hud-val" id="timer-val">60</div><div class="hud-lbl">Seconds</div></div>
+      <div class="hud-item"><div class="hud-val" id="score-val">0</div><div class="hud-lbl">Correct</div></div>
+      <div class="hud-item"><div class="hud-val" id="asked-val">0</div><div class="hud-lbl">Asked</div></div>
     </div>
-    <div class="progress-bar">
-      <div class="progress-fill" id="progress-fill"></div>
-    </div>
+    <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 
     <div class="player-card" id="player-card">
       <div class="player-photo-wrap">
@@ -544,17 +372,14 @@
       <div class="answer-overlay" id="answer-overlay"></div>
     </div>
 
-    <!-- Type mode -->
     <div id="type-area" class="type-area">
       <input type="text" id="name-input" placeholder="Type last name or full name…" autocomplete="off" autocorrect="off" spellcheck="false">
       <button class="btn-skip" id="btn-skip">Skip</button>
     </div>
-
-    <!-- Multiple choice mode -->
     <div id="mc-area" class="choices" style="display:none"></div>
   </div>
 
-  <!-- ── Results screen ─────────────────────────────────────────── -->
+  <!-- ── Results screen ── -->
   <div class="screen" id="screen-results">
     <div class="results-header">
       <div class="results-score" id="final-score">0</div>
@@ -562,17 +387,26 @@
     </div>
 
     <div class="stat-row">
-      <div class="stat-box">
-        <div class="stat-val" id="stat-asked">0</div>
-        <div class="stat-lbl">Shown</div>
+      <div class="stat-box"><div class="stat-val" id="stat-asked">0</div><div class="stat-lbl">Shown</div></div>
+      <div class="stat-box"><div class="stat-val" id="stat-acc">—</div><div class="stat-lbl">Accuracy</div></div>
+      <div class="stat-box"><div class="stat-val" id="stat-streak">0</div><div class="stat-lbl">Best streak</div></div>
+    </div>
+
+    <!-- Name entry -->
+    <div class="name-entry" id="name-entry">
+      <p>Submit your score to the leaderboard</p>
+      <div class="name-entry-row">
+        <input type="text" id="player-name-input" placeholder="Your name" maxlength="24" autocomplete="off">
+        <button class="btn-submit-score" id="btn-submit-score">Submit</button>
       </div>
-      <div class="stat-box">
-        <div class="stat-val" id="stat-acc">—</div>
-        <div class="stat-lbl">Accuracy</div>
-      </div>
-      <div class="stat-box">
-        <div class="stat-val" id="stat-streak">0</div>
-        <div class="stat-lbl">Best streak</div>
+      <button class="btn-skip-leaderboard" id="btn-skip-leaderboard">Skip</button>
+    </div>
+
+    <!-- Leaderboard -->
+    <div class="leaderboard-section">
+      <h3>All-time leaderboard</h3>
+      <div class="leaderboard-list" id="leaderboard-list">
+        <div class="lb-loading">Loading scores…</div>
       </div>
     </div>
 
@@ -587,23 +421,15 @@
 </main>
 
 <script>
-// ─── State ─────────────────────────────────────────────────────────────────
+const JSONBIN_ID  = '6a2c7dcef5f4af5e29e923c3';
+const JSONBIN_KEY = '$2a$10$ZZsdXuF9QgrHjPmZ8ibUQOEyfrHVO6bskg85gdjF55UNxg2yU36xi';
+const JSONBIN_URL = `https://api.jsonbin.io/v3/b/${JSONBIN_ID}`;
 
-let players   = [];          // full loaded list
-let queue     = [];          // shuffled copy for this game
-let current   = null;        // current player object
-let mode      = 'type';      // 'type' | 'mc'
-let totalSecs = 120;
-let timer     = null;
-let secsLeft  = 0;
+let players = [], queue = [], current = null;
+let mode = 'type', totalSecs = 120, timer = null, secsLeft = 0;
+let score = 0, asked = 0, streak = 0, bestStreak = 0, missed = [];
 
-let score    = 0;
-let asked    = 0;
-let streak   = 0;
-let bestStreak = 0;
-let missed   = [];           // players the user got wrong or skipped
-
-// ─── Load players.json ──────────────────────────────────────────────────────
+// ── Load players ──────────────────────────────────────────────────────────────
 
 async function loadPlayers() {
   try {
@@ -615,14 +441,13 @@ async function loadPlayers() {
     document.getElementById('btn-start').textContent = 'Start game';
   } catch (e) {
     document.getElementById('load-status').className = 'error-msg';
-    document.getElementById('load-status').innerHTML =
-      `Could not load player data.<br>Make sure you've run <code>fetch_atp.py</code> first.`;
+    document.getElementById('load-status').innerHTML = `Could not load player data.<br>Make sure you've run <code>fetch_atp.py</code> first.`;
   }
 }
 
 loadPlayers();
 
-// ─── UI helpers ─────────────────────────────────────────────────────────────
+// ── Helpers ───────────────────────────────────────────────────────────────────
 
 function showScreen(id) {
   document.querySelectorAll('.screen').forEach(s => s.classList.remove('active'));
@@ -638,7 +463,7 @@ function shuffle(arr) {
   return a;
 }
 
-// ─── Mode / duration toggles ─────────────────────────────────────────────────
+// ── Toggles ───────────────────────────────────────────────────────────────────
 
 document.querySelectorAll('.mode-btn').forEach(btn => {
   btn.addEventListener('click', () => {
@@ -656,19 +481,17 @@ document.querySelectorAll('.dur-btn').forEach(btn => {
   });
 });
 
-// ─── Start game ─────────────────────────────────────────────────────────────
+// ── Game ──────────────────────────────────────────────────────────────────────
 
 document.getElementById('btn-start').addEventListener('click', startGame);
 document.getElementById('btn-play-again').addEventListener('click', () => showScreen('screen-start'));
 
 function startGame() {
   score = 0; asked = 0; streak = 0; bestStreak = 0; missed = [];
-  queue = shuffle(players.filter(p => p.photo || p.photoUrl)); // only players with photos
+  queue = shuffle(players.filter(p => p.photo || p.photoUrl));
   secsLeft = totalSecs;
-
   document.getElementById('type-area').style.display = mode === 'type' ? 'flex' : 'none';
   document.getElementById('mc-area').style.display   = mode === 'mc'   ? 'grid' : 'none';
-
   updateHUD();
   showScreen('screen-game');
   nextPlayer();
@@ -676,14 +499,11 @@ function startGame() {
   if (mode === 'type') document.getElementById('name-input').focus();
 }
 
-// ─── Timer ───────────────────────────────────────────────────────────────────
-
 function startTimer() {
   clearInterval(timer);
   const fill = document.getElementById('progress-fill');
   fill.style.width = '100%';
   fill.style.background = 'var(--accent)';
-
   timer = setInterval(() => {
     secsLeft--;
     const pct = (secsLeft / totalSecs) * 100;
@@ -695,39 +515,26 @@ function startTimer() {
   }, 1000);
 }
 
-// ─── Show next player ────────────────────────────────────────────────────────
-
 function nextPlayer() {
   if (queue.length === 0) { endGame(); return; }
   current = queue.pop();
   asked++;
-
-  // Photo
   const img = document.getElementById('player-photo');
   const fb  = document.getElementById('photo-fb');
   img.style.display = 'block';
   fb.style.display  = 'none';
   img.src = current.photo || current.photoUrl || '';
-
   document.getElementById('player-rank').textContent    = '#' + current.rank;
   document.getElementById('player-country').textContent = current.country || '';
-
-  // Clear overlay
   const ov = document.getElementById('answer-overlay');
   ov.className = 'answer-overlay';
   ov.textContent = '';
-
-  // Clear input
   const inp = document.getElementById('name-input');
   inp.value = '';
   inp.className = '';
-
   updateHUD();
-
   if (mode === 'mc') buildChoices();
 }
-
-// ─── HUD update ──────────────────────────────────────────────────────────────
 
 function updateHUD() {
   document.getElementById('score-val').textContent = score;
@@ -735,14 +542,8 @@ function updateHUD() {
   document.getElementById('timer-val').textContent = secsLeft;
 }
 
-// ─── Answer checking ─────────────────────────────────────────────────────────
-
-// Normalize: lowercase, remove accents, trim
 function norm(s) {
-  return s.toLowerCase()
-    .normalize('NFD').replace(/[\u0300-\u036f]/g, '')
-    .replace(/[^a-z\s]/g, '')
-    .trim();
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z\s]/g, '').trim();
 }
 
 function checkAnswer(guess) {
@@ -761,79 +562,51 @@ function flashOverlay(type, text) {
 }
 
 function markCorrect() {
-  score++;
-  streak++;
+  score++; streak++;
   if (streak > bestStreak) bestStreak = streak;
   flashOverlay('correct', '✓ ' + current.name);
   updateHUD();
   setTimeout(() => { nextPlayer(); document.getElementById('name-input').focus(); }, 900);
 }
 
-function markWrong(label = '') {
-  streak = 0;
-  missed.push(current);
+function markWrong() {
+  streak = 0; missed.push(current);
   flashOverlay('wrong', '✗ ' + current.name);
   updateHUD();
   setTimeout(nextPlayer, 1100);
 }
 
 function markSkip() {
-  streak = 0;
-  missed.push(current);
+  streak = 0; missed.push(current);
   flashOverlay('skip', current.name);
   setTimeout(nextPlayer, 1000);
 }
 
-// ─── Type mode ───────────────────────────────────────────────────────────────
-
 const inp = document.getElementById('name-input');
-
 inp.addEventListener('input', () => {
-  if (checkAnswer(inp.value)) {
-    inp.className = 'correct';
-    inp.blur();
-    markCorrect();
-  }
+  if (checkAnswer(inp.value)) { inp.className = 'correct'; inp.blur(); markCorrect(); }
 });
-
 inp.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && inp.value.trim()) {
-    if (!checkAnswer(inp.value)) {
-      inp.className = 'wrong';
-      markWrong();
-    }
-  }
+  if (e.key === 'Enter' && inp.value.trim()) { if (!checkAnswer(inp.value)) { inp.className = 'wrong'; markWrong(); } }
   if (e.key === 'Escape') markSkip();
 });
-
 document.getElementById('btn-skip').addEventListener('click', markSkip);
-
-// ─── Multiple choice mode ────────────────────────────────────────────────────
 
 function buildChoices() {
   const container = document.getElementById('mc-area');
   container.innerHTML = '';
-
-  // Pick 3 wrong answers from the pool (not current)
-  const others = shuffle(players.filter(p => p.id !== current.id)).slice(0, 3);
+  const others  = shuffle(players.filter(p => p.id !== current.id)).slice(0, 3);
   const options = shuffle([current, ...others]);
-
   options.forEach(player => {
     const btn = document.createElement('button');
     btn.className = 'choice-btn';
     btn.innerHTML = `<span style="font-size:12px;color:var(--muted)">Rank #${player.rank}</span><br>${player.name}`;
     btn.addEventListener('click', () => {
-      // Disable all
       container.querySelectorAll('.choice-btn').forEach(b => b.disabled = true);
-      if (player.id === current.id) {
-        btn.classList.add('correct');
-        markCorrect();
-      } else {
+      if (player.id === current.id) { btn.classList.add('correct'); markCorrect(); }
+      else {
         btn.classList.add('wrong');
-        // Highlight correct
-        container.querySelectorAll('.choice-btn').forEach(b => {
-          if (b.textContent.includes(current.name.split(' ').pop())) b.classList.add('correct');
-        });
+        container.querySelectorAll('.choice-btn').forEach(b => { if (b.textContent.includes(current.name.split(' ').pop())) b.classList.add('correct'); });
         markWrong();
       }
     });
@@ -841,21 +614,19 @@ function buildChoices() {
   });
 }
 
-// ─── End game ────────────────────────────────────────────────────────────────
+// ── End game ──────────────────────────────────────────────────────────────────
 
 function endGame() {
   clearInterval(timer);
-
   document.getElementById('final-score').textContent = score;
   document.getElementById('stat-asked').textContent  = asked;
-  document.getElementById('stat-acc').textContent    = asked > 0
-    ? Math.round((score / asked) * 100) + '%' : '—';
+  document.getElementById('stat-acc').textContent    = asked > 0 ? Math.round((score / asked) * 100) + '%' : '—';
   document.getElementById('stat-streak').textContent = bestStreak;
 
+  // Missed players
   const ms = document.getElementById('missed-section');
   const ml = document.getElementById('missed-list');
   ml.innerHTML = '';
-
   if (missed.length > 0) {
     ms.style.display = 'block';
     missed.forEach(p => {
@@ -865,16 +636,108 @@ function endGame() {
         <span class="missed-rank">#${p.rank}</span>
         <img class="missed-thumb" src="${p.photo || p.photoUrl || ''}" alt="" onerror="this.style.display='none'">
         <span class="missed-name">${p.name}</span>
-        <span class="missed-country">${p.country || ''}</span>
-      `;
+        <span class="missed-country">${p.country || ''}</span>`;
       ml.appendChild(el);
     });
   } else {
     ms.style.display = 'none';
   }
 
+  // Reset name entry
+  document.getElementById('player-name-input').value = '';
+  document.getElementById('name-entry').style.display = 'flex';
+
+  loadLeaderboard();
   showScreen('screen-results');
 }
+
+// ── Leaderboard ───────────────────────────────────────────────────────────────
+
+async function loadLeaderboard() {
+  const list = document.getElementById('leaderboard-list');
+  list.innerHTML = '<div class="lb-loading">Loading scores…</div>';
+  try {
+    const r = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    const data = await r.json();
+    const scores = (data.record?.scores || []).sort((a, b) => b.score - a.score).slice(0, 10);
+    renderLeaderboard(scores, null);
+  } catch (e) {
+    list.innerHTML = '<div class="lb-loading">Could not load scores.</div>';
+  }
+}
+
+function renderLeaderboard(scores, highlightName) {
+  const list = document.getElementById('leaderboard-list');
+  if (scores.length === 0) {
+    list.innerHTML = '<div class="lb-loading">No scores yet — be the first!</div>';
+    return;
+  }
+  const medals = ['gold', 'silver', 'bronze'];
+  list.innerHTML = scores.map((s, i) => {
+    const rankClass = medals[i] || '';
+    const isYou = highlightName && s.name === highlightName && s.score === score;
+    return `<div class="lb-item${isYou ? ' lb-you' : ''}">
+      <span class="lb-rank ${rankClass}">${i + 1}</span>
+      <span class="lb-name">${s.name}${isYou ? ' 👈' : ''}</span>
+      <span class="lb-score">${s.score}</span>
+      <span class="lb-meta">${s.mode} · ${s.time}m</span>
+    </div>`;
+  }).join('');
+}
+
+async function submitScore(name) {
+  try {
+    // Read current scores
+    const r = await fetch(JSONBIN_URL + '/latest', {
+      headers: { 'X-Master-Key': JSONBIN_KEY }
+    });
+    const data = await r.json();
+    const scores = data.record?.scores || [];
+
+    // Add new score
+    scores.push({
+      name,
+      score,
+      mode,
+      time: Math.round(totalSecs / 60),
+      date: new Date().toISOString().split('T')[0]
+    });
+
+    // Keep top 100 all-time, sorted by score
+    scores.sort((a, b) => b.score - a.score);
+    const trimmed = scores.slice(0, 100);
+
+    // Write back
+    await fetch(JSONBIN_URL, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
+      body: JSON.stringify({ scores: trimmed })
+    });
+
+    // Show updated leaderboard with your entry highlighted
+    const top10 = trimmed.slice(0, 10);
+    renderLeaderboard(top10, name);
+  } catch (e) {
+    console.error('Failed to save score', e);
+  }
+}
+
+document.getElementById('btn-submit-score').addEventListener('click', () => {
+  const name = document.getElementById('player-name-input').value.trim();
+  if (!name) return;
+  document.getElementById('name-entry').style.display = 'none';
+  submitScore(name);
+});
+
+document.getElementById('player-name-input').addEventListener('keydown', e => {
+  if (e.key === 'Enter') document.getElementById('btn-submit-score').click();
+});
+
+document.getElementById('btn-skip-leaderboard').addEventListener('click', () => {
+  document.getElementById('name-entry').style.display = 'none';
+});
 </script>
 </body>
 </html>
