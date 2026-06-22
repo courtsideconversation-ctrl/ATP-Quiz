@@ -489,7 +489,7 @@ function startGame() {
   showScreen('screen-game');
   nextPlayer();
   startTimer();
-  if (mode === 'type') document.getElementById('name-input').focus();
+  if (mode === 'type') if (window.innerWidth > 600) document.getElementById('name-input').focus();
 }
 
 function startTimer() {
@@ -559,7 +559,7 @@ function markCorrect() {
   if (streak > bestStreak) bestStreak = streak;
   flashOverlay('correct', '✓ ' + current.name);
   updateHUD();
-  setTimeout(() => { nextPlayer(); document.getElementById('name-input').focus(); }, 900);
+  setTimeout(() => { nextPlayer(); if (window.innerWidth > 600) document.getElementById('name-input').focus(); }, 900);
 }
 
 function markWrong() {
