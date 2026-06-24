@@ -333,6 +333,14 @@
     .player-photo-wrap { max-height: 260px; }
   }
 </style>
+<!-- Google tag (gtag.js) -->
+<script async src="https://www.googletagmanager.com/gtag/js?id=G-VVPDY1F160"></script>
+<script>
+  window.dataLayer = window.dataLayer || [];
+  function gtag(){dataLayer.push(arguments);}
+  gtag('js', new Date());
+  gtag('config', 'G-VVPDY1F160');
+</script>
 </head>
 <body>
 
@@ -900,6 +908,30 @@ function renderOverlayLb() {
       <span class="lb-score">${s.score}</span>
     </div>`).join('');
 }
+</script>
+<!-- ── CourtsideConversation Analytics ── -->
+<script>
+(function() {
+  const ENDPOINT = 'https://script.google.com/macros/s/AKfycbzoizk6GpofHHaOqFpcZUNCopsYGJvwVDXzUVC5JMSzCuKvN6cB06QYX9nsYOQmdWEBxg/exec';
+  function getVisitorId() {
+    let id = localStorage.getItem('cc_visitor_id');
+    const isNew = !id;
+    if (!id) {
+      id = 'v_' + Math.random().toString(36).slice(2) + Date.now().toString(36);
+      localStorage.setItem('cc_visitor_id', id);
+    }
+    return { id, isNew };
+  }
+  function logEvent(event, game) {
+    const { id, isNew } = getVisitorId();
+    fetch(ENDPOINT, {
+      method: 'POST',
+      body: JSON.stringify({ visitorId: id, event, game: game || '', isNew }),
+    }).catch(() => {});
+  }
+  window.ccTrack = logEvent;
+  logEvent('page_load', '');
+})();
 </script>
 </body>
 </html>
