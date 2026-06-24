@@ -195,7 +195,15 @@
   .answer-overlay.wrong   { background: rgba(226,92,92,0.92); color: #fff; }
   .answer-overlay.skip    { background: rgba(50,50,50,0.92); color: var(--muted); font-family: var(--font-body); font-size: 15px; font-weight: 400; }
 
-  .type-area { display: flex; gap: 8px; }
+  .type-area { display: flex; gap: 8px; position: relative; }
+  .type-dd-item {
+    padding: 11px 16px; cursor: pointer; font-size: 14px; font-weight: 500;
+    border-bottom: 1px solid var(--border); transition: background 0.1s;
+    display: flex; align-items: center; justify-content: space-between;
+  }
+  .type-dd-item:last-child { border-bottom: none; }
+  .type-dd-item:hover, .type-dd-item.hi { background: var(--surface2); }
+  .type-dd-item .dd-rank { font-size: 12px; color: var(--muted); }
   #name-input {
     flex: 1; padding: 14px 16px;
     background: var(--surface); border: 1px solid var(--border);
@@ -375,7 +383,8 @@
     </div>
 
     <div id="type-area" class="type-area">
-      <input type="text" id="name-input" placeholder="Type last name or full name…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <input type="text" id="name-input" placeholder="Type a player name…" autocomplete="off" autocorrect="off" spellcheck="false">
+      <div id="type-dropdown" style="position:absolute;top:100%;left:0;right:0;background:var(--surface);border:1px solid var(--border);border-radius:0 0 var(--radius) var(--radius);overflow:hidden;z-index:100;display:none;box-shadow:0 8px 24px rgba(0,0,0,0.4);"></div>
       <button class="btn-skip" id="btn-skip">Skip</button>
     </div>
     <div id="mc-area" class="choices" style="display:none"></div>
@@ -542,6 +551,7 @@ function nextPlayer() {
   const inp = document.getElementById('name-input');
   inp.value = '';
   inp.className = '';
+  if (typeof closeTypeDd === 'function') closeTypeDd();
   updateHUD();
   if (mode === 'mc') buildChoices();
 }
@@ -593,13 +603,82 @@ function markSkip() {
 }
 
 const inp = document.getElementById('name-input');
+const typeDd = document.getElementById('type-dropdown');
+let ddHiIdx = -1;
+
+function norm(s) {
+  return s.toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g, '').replace(/[^a-z\s]/g, '').trim();
+}
+
+function getTypeSuggestions(q) {
+  if (!q || q.length < 1) return [];
+  const qn = norm(q);
+  return players.filter(p => {
+    const n = norm(p.name);
+    return n.startsWith(qn) || n.split(' ').some(w => w.startsWith(qn));
+  }).slice(0, 8);
+}
+
+function renderTypeDd(suggestions) {
+  if (!suggestions.length) { closeTypeDd(); return; }
+  typeDd.innerHTML = suggestions.map((p, i) => `
+    <div class="type-dd-item" data-index="${i}">
+      <span>${p.name}</span>
+      <span class="dd-rank">#${p.rank}</span>
+    </div>`).join('');
+  typeDd.style.display = 'block';
+  ddHiIdx = -1;
+  typeDd.querySelectorAll('.type-dd-item').forEach(item => {
+    item.addEventListener('mousedown', e => {
+      e.preventDefault();
+      submitTypeGuess(suggestions[parseInt(item.dataset.index)]);
+    });
+  });
+}
+
+function closeTypeDd() {
+  typeDd.style.display = 'none';
+  typeDd.innerHTML = '';
+  ddHiIdx = -1;
+}
+
+function submitTypeGuess(player) {
+  inp.value = '';
+  closeTypeDd();
+  if (player.id === current.id) {
+    inp.className = 'correct';
+    markCorrect();
+  } else {
+    inp.className = 'wrong';
+    markWrong();
+  }
+}
+
 inp.addEventListener('input', () => {
-  if (checkAnswer(inp.value)) { inp.className = 'correct'; inp.blur(); markCorrect(); }
+  inp.className = '';
+  renderTypeDd(getTypeSuggestions(inp.value));
 });
+
 inp.addEventListener('keydown', e => {
-  if (e.key === 'Enter' && inp.value.trim()) { if (!checkAnswer(inp.value)) { inp.className = 'wrong'; markWrong(); } }
-  if (e.key === 'Escape') markSkip();
+  const items = [...typeDd.querySelectorAll('.type-dd-item')];
+  if (e.key === 'ArrowDown') {
+    e.preventDefault();
+    ddHiIdx = Math.min(ddHiIdx + 1, items.length - 1);
+    items.forEach((el, i) => el.classList.toggle('hi', i === ddHiIdx));
+  } else if (e.key === 'ArrowUp') {
+    e.preventDefault();
+    ddHiIdx = Math.max(ddHiIdx - 1, 0);
+    items.forEach((el, i) => el.classList.toggle('hi', i === ddHiIdx));
+  } else if (e.key === 'Enter' && ddHiIdx >= 0) {
+    e.preventDefault();
+    items[ddHiIdx].dispatchEvent(new Event('mousedown'));
+  } else if (e.key === 'Escape') {
+    closeTypeDd();
+    markSkip();
+  }
 });
+
+inp.addEventListener('blur', () => setTimeout(closeTypeDd, 150));
 document.getElementById('btn-skip').addEventListener('click', markSkip);
 
 function buildChoices() {
