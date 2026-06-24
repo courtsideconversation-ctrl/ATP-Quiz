@@ -866,8 +866,12 @@ document.getElementById('btn-skip-leaderboard').addEventListener('click', () => 
 </div>
 
 <script>
-function openLbOverlay() {
+async function openLbOverlay() {
   document.getElementById('lb-overlay').style.display = 'block';
+  if (!allScores || !allScores.length) {
+    document.getElementById('lb-overlay-list').innerHTML = '<div class="lb-loading">Loading scores…</div>';
+    await loadLeaderboard();
+  }
   renderOverlayLb();
 }
 function closeLbOverlay() {
