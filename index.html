@@ -786,7 +786,7 @@ function renderLeaderboard(scores, highlightName) {
     const isYou = highlightName && s.name === highlightName && s.score === score;
     return `<div class="lb-item${isYou ? ' lb-you' : ''}">
       <span class="lb-rank ${rankClass}">${i + 1}</span>
-      <span class="lb-name">${s.name}${isYou ? ' 👈' : ''}</span>
+      <span class="lb-name">${s.name}${isYou ? '' : ''}</span>
       <span class="lb-score">${s.score}</span>
     </div>`;
   }).join('');
