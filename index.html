@@ -287,7 +287,12 @@
   }
 
   /* ── Leaderboard ── */
-  .leaderboard-section h3 { font-size: 13px; color: var(--muted); text-transform: uppercase; letter-spacing: 0.07em; margin-bottom: 12px; }
+  .lb-tab {
+    padding: 6px 12px; border: 1px solid var(--border); border-radius: 100px;
+    background: transparent; color: var(--muted); font-family: var(--font-body);
+    font-size: 12px; cursor: pointer; transition: all 0.15s;
+  }
+  .lb-tab.active { border-color: var(--accent); color: var(--accent); background: rgba(168,197,58,0.1); }
   .leaderboard-list { display: flex; flex-direction: column; gap: 6px; }
   .lb-item {
     display: flex; align-items: center; gap: 10px;
@@ -402,6 +407,14 @@
     <!-- Leaderboard -->
     <div class="leaderboard-section">
       <h3>All-time leaderboard</h3>
+      <div style="display:flex;gap:6px;flex-wrap:wrap;margin-bottom:12px;" id="lb-tabs">
+        <button class="lb-tab active" onclick="setLbTab('type','1')">Type · 1m</button>
+        <button class="lb-tab" onclick="setLbTab('type','2')">Type · 2m</button>
+        <button class="lb-tab" onclick="setLbTab('type','3')">Type · 3m</button>
+        <button class="lb-tab" onclick="setLbTab('mc','1')">MC · 1m</button>
+        <button class="lb-tab" onclick="setLbTab('mc','2')">MC · 2m</button>
+        <button class="lb-tab" onclick="setLbTab('mc','3')">MC · 3m</button>
+      </div>
       <div class="leaderboard-list" id="leaderboard-list">
         <div class="lb-loading">Loading scores…</div>
       </div>
@@ -650,6 +663,18 @@ function endGame() {
 
 // ── Leaderboard ───────────────────────────────────────────────────────────────
 
+let allScores = [];
+let currentLbMode = 'type';
+let currentLbTime = '1';
+
+function setLbTab(m, t) {
+  currentLbMode = m;
+  currentLbTime = t;
+  document.querySelectorAll('.lb-tab').forEach(btn => btn.classList.remove('active'));
+  event.target.classList.add('active');
+  renderLeaderboard(allScores, null);
+}
+
 async function loadLeaderboard() {
   const list = document.getElementById('leaderboard-list');
   list.innerHTML = '<div class="lb-loading">Loading scores…</div>';
@@ -658,8 +683,8 @@ async function loadLeaderboard() {
       headers: { 'X-Master-Key': JSONBIN_KEY }
     });
     const data = await r.json();
-    const scores = (data.record?.scores || []).sort((a, b) => b.score - a.score);
-    renderLeaderboard(scores, null);
+    allScores = (data.record?.scores || []).sort((a, b) => b.score - a.score);
+    renderLeaderboard(allScores, null);
   } catch (e) {
     list.innerHTML = '<div class="lb-loading">Could not load scores.</div>';
   }
@@ -667,54 +692,59 @@ async function loadLeaderboard() {
 
 function renderLeaderboard(scores, highlightName) {
   const list = document.getElementById('leaderboard-list');
-  if (scores.length === 0) {
+  const filtered = scores.filter(s =>
+    s.mode === currentLbMode && String(s.time) === String(currentLbTime)
+  );
+  if (filtered.length === 0) {
     list.innerHTML = '<div class="lb-loading">No scores yet — be the first!</div>';
     return;
   }
   const medals = ['gold', 'silver', 'bronze'];
-  list.innerHTML = scores.map((s, i) => {
+  list.innerHTML = filtered.map((s, i) => {
     const rankClass = medals[i] || '';
     const isYou = highlightName && s.name === highlightName && s.score === score;
     return `<div class="lb-item${isYou ? ' lb-you' : ''}">
       <span class="lb-rank ${rankClass}">${i + 1}</span>
       <span class="lb-name">${s.name}${isYou ? ' 👈' : ''}</span>
       <span class="lb-score">${s.score}</span>
-      <span class="lb-meta">${s.mode} · ${s.time}m</span>
     </div>`;
   }).join('');
 }
 
 async function submitScore(name) {
   try {
-    // Read current scores
     const r = await fetch(JSONBIN_URL + '/latest', {
       headers: { 'X-Master-Key': JSONBIN_KEY }
     });
     const data = await r.json();
     const scores = data.record?.scores || [];
 
-    // Add new score
     scores.push({
-      name,
-      score,
-      mode,
+      name, score, mode,
       time: Math.round(totalSecs / 60),
       date: new Date().toISOString().split('T')[0]
     });
 
-    // Keep top 100 all-time, sorted by score
     scores.sort((a, b) => b.score - a.score);
     const trimmed = scores.slice(0, 100);
 
-    // Write back
     await fetch(JSONBIN_URL, {
       method: 'PUT',
       headers: { 'Content-Type': 'application/json', 'X-Master-Key': JSONBIN_KEY },
       body: JSON.stringify({ scores: trimmed })
     });
 
-    // Show updated leaderboard with your entry highlighted
-    renderLeaderboard(trimmed, name);
+    allScores = trimmed;
+
+    // Switch to the tab matching what was just played
+    currentLbMode = mode;
+    currentLbTime = String(Math.round(totalSecs / 60));
+    document.querySelectorAll('.lb-tab').forEach(btn => {
+      const [m, t] = btn.textContent.toLowerCase().replace('m','').split(' · ');
+      btn.classList.toggle('active', m === currentLbMode && t === currentLbTime);
+    });
+
+    renderLeaderboard(allScores, name);
   } catch (e) {
     console.error('Failed to save score', e);
   }
