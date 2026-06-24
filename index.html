@@ -361,6 +361,7 @@
     </div>
     <button class="btn-start" id="btn-start" disabled>Loading players…</button>
     <p id="load-status" class="loading-msg">Fetching ATP top 100…</p>
+    <button onclick="openLbOverlay()" style="padding:10px;border:1px solid var(--border);border-radius:var(--radius);background:transparent;color:var(--muted);font-family:var(--font-body);font-size:14px;cursor:pointer;">View leaderboard</button>
   </div>
 
   <!-- ── Game screen ── -->
@@ -369,6 +370,7 @@
       <div class="hud-item"><div class="hud-val" id="timer-val">60</div><div class="hud-lbl">Seconds</div></div>
       <div class="hud-item"><div class="hud-val" id="score-val">0</div><div class="hud-lbl">Correct</div></div>
       <div class="hud-item"><div class="hud-val" id="asked-val">0</div><div class="hud-lbl">Asked</div></div>
+      <button id="btn-show-lb" onclick="openLbOverlay()" style="padding:6px 12px;border:1px solid var(--border);border-radius:8px;background:transparent;color:var(--muted);font-family:var(--font-body);font-size:12px;cursor:pointer;">Leaderboard</button>
     </div>
     <div class="progress-bar"><div class="progress-fill" id="progress-fill"></div></div>
 
@@ -843,6 +845,57 @@ document.getElementById('player-name-input').addEventListener('keydown', e => {
 document.getElementById('btn-skip-leaderboard').addEventListener('click', () => {
   document.getElementById('name-entry').style.display = 'none';
 });
+</script>
+<!-- Leaderboard overlay (accessible during game) -->
+<div id="lb-overlay" style="display:none;position:fixed;inset:0;background:rgba(0,0,0,0.8);z-index:500;padding:24px;overflow-y:auto;backdrop-filter:blur(4px);">
+  <div style="max-width:480px;margin:0 auto;background:var(--surface);border:1px solid var(--border);border-radius:var(--radius);padding:28px 24px;display:flex;flex-direction:column;gap:16px;">
+    <div style="display:flex;align-items:center;justify-content:space-between;">
+      <h2 style="font-family:var(--font-display);font-size:22px;font-weight:900;">Leaderboard</h2>
+      <button onclick="closeLbOverlay()" style="background:transparent;border:1px solid var(--border);border-radius:6px;width:30px;height:30px;color:var(--muted);cursor:pointer;font-size:16px;">✕</button>
+    </div>
+    <div style="display:flex;gap:6px;flex-wrap:wrap;" id="lb-overlay-tabs">
+      <button class="lb-tab active" onclick="setOverlayTab('type','1',event)">Type · 1m</button>
+      <button class="lb-tab" onclick="setOverlayTab('type','2',event)">Type · 2m</button>
+      <button class="lb-tab" onclick="setOverlayTab('type','3',event)">Type · 3m</button>
+      <button class="lb-tab" onclick="setOverlayTab('mc','1',event)">MC · 1m</button>
+      <button class="lb-tab" onclick="setOverlayTab('mc','2',event)">MC · 2m</button>
+      <button class="lb-tab" onclick="setOverlayTab('mc','3',event)">MC · 3m</button>
+    </div>
+    <div class="leaderboard-list" id="lb-overlay-list"><div class="lb-loading">Loading…</div></div>
+  </div>
+</div>
+
+<script>
+function openLbOverlay() {
+  document.getElementById('lb-overlay').style.display = 'block';
+  renderOverlayLb();
+}
+function closeLbOverlay() {
+  document.getElementById('lb-overlay').style.display = 'none';
+}
+function setOverlayTab(m, t, e) {
+  currentLbMode = m;
+  currentLbTime = t;
+  document.querySelectorAll('#lb-overlay-tabs .lb-tab').forEach(b => b.classList.remove('active'));
+  e.target.classList.add('active');
+  renderOverlayLb();
+}
+function renderOverlayLb() {
+  const list = document.getElementById('lb-overlay-list');
+  if (!allScores || !allScores.length) {
+    list.innerHTML = '<div class="lb-loading">No scores yet.</div>';
+    return;
+  }
+  const filtered = allScores.filter(s => s.mode === currentLbMode && String(s.time) === String(currentLbTime));
+  if (!filtered.length) { list.innerHTML = '<div class="lb-loading">No scores yet — be the first!</div>'; return; }
+  const medals = ['gold','silver','bronze'];
+  list.innerHTML = filtered.map((s,i) => `
+    <div class="lb-item">
+      <span class="lb-rank ${medals[i]||''}">${i+1}</span>
+      <span class="lb-name">${s.name}</span>
+      <span class="lb-score">${s.score}</span>
+    </div>`).join('');
+}
 </script>
 </body>
 </html>
