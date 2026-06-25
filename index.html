@@ -666,7 +666,23 @@ function submitTypeGuess(player) {
 
 inp.addEventListener('input', () => {
   inp.className = '';
-  renderTypeDd(getTypeSuggestions(inp.value));
+  const suggestions = getTypeSuggestions(inp.value);
+
+  // Auto-submit if input exactly matches a first or last name uniquely
+  const qn = norm(inp.value);
+  if (qn.length >= 3) {
+    const exactMatches = players.filter(p => {
+      const parts = norm(p.name).split(' ');
+      return parts[0] === qn || parts[parts.length - 1] === qn;
+    });
+    if (exactMatches.length === 1) {
+      closeTypeDd();
+      submitTypeGuess(exactMatches[0]);
+      return;
+    }
+  }
+
+  renderTypeDd(suggestions);
 });
 
 inp.addEventListener('keydown', e => {
